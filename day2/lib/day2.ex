@@ -32,4 +32,23 @@ defmodule Day2 do
       char_count >= from && char_count <= to
     end)
   end
+
+  # --------
+
+  def solve2() do
+    File.read!("input")
+    |> password_lines()
+    |> filter_valid_passwords2
+    |> Enum.count()
+  end
+
+  def filter_valid_passwords2(password_lines) do
+    password_lines
+    |> Enum.filter(fn {from, to, char, password} ->
+      codepoints = String.codepoints(password)
+
+      (Enum.at(codepoints, from - 1) == char && Enum.at(codepoints, to - 1) != char) ||
+        (Enum.at(codepoints, from - 1) != char && Enum.at(codepoints, to - 1) == char)
+    end)
+  end
 end
