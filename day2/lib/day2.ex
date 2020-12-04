@@ -6,7 +6,7 @@ defmodule Day2 do
   def solve1() do
     File.read!("input")
     |> password_lines()
-    |> filter_valid_passords
+    |> filter_valid_passwords
     |> Enum.count()
   end
 
@@ -25,7 +25,7 @@ defmodule Day2 do
     {String.to_integer(from_str), String.to_integer(to_str)}
   end
 
-  def filter_valid_passords(password_lines) do
+  def filter_valid_passwords(password_lines) do
     password_lines
     |> Enum.filter(fn {from, to, char, password} ->
       char_count = String.codepoints(password) |> Enum.filter(&(&1 == char)) |> Enum.count()
