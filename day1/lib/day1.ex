@@ -39,8 +39,7 @@ defmodule Day1 do
   end
 
   def find_triple_with_sum_2020([number1 | numbers]) do
-    result = find_triple_with_sum_2020(number1, numbers)
-    case result do
+    case find_triple_with_sum_2020(number1, numbers) do
       {:ok, {first_number, second_number, third_number}} -> {first_number, second_number, third_number}
       _ -> find_triple_with_sum_2020(numbers)
     end
