@@ -7,12 +7,12 @@ defmodule Day5 do
     File.read!("input")
     |> String.split("\n")
     |> process_seat_specifiers()
+    |> max()
   end
 
   def process_seat_specifiers(seat_specifiers) do
     seat_specifiers
     |> Enum.map(&(String.codepoints(&1) |> process_regions()))
-    |> max()
   end
 
   def max([a]), do: a
@@ -43,5 +43,21 @@ defmodule Day5 do
       "L" -> first..div(first + last, 2)
       "R" -> div(first + last + 1, 2)..last
     end
+  end
+
+  # ---------------
+
+  def solve2() do
+    seat_ids =
+      File.read!("input")
+      |> String.split("\n")
+      |> process_seat_specifiers()
+      |> Enum.sort()
+
+    Enum.reduce_while(seat_ids, Enum.at(seat_ids, 0), fn seat_id, acc ->
+      if acc == seat_id,
+        do: {:cont, acc + 1},
+        else: {:halt, acc}
+    end)
   end
 end

@@ -13,4 +13,8 @@ defmodule Day5Test do
   test "solve1" do
     assert Day5.solve1() == 994
   end
+
+  test "solve2" do
+    assert Day5.solve2() == 741
+  end
 end
