@@ -4,14 +4,22 @@ defmodule Day5 do
   """
 
   def solve1() do
-    File.read!("testinput")
-    |> String.codepoints()
-    |> process_regions()
+    File.read!("input")
+    |> String.split("\n")
+    |> process_seat_specifiers()
   end
 
-  # def process_seat_specifiers(seat_specifiers) do
+  def process_seat_specifiers(seat_specifiers) do
+    seat_specifiers
+    |> Enum.map(&(String.codepoints(&1) |> process_regions()))
+    |> max()
+  end
 
-  # end
+  def max([a]), do: a
+  def max([head | tail]), do: Enum.reduce(tail, head, &check_big/2)
+
+  def check_big(a, b) when a > b, do: a
+  def check_big(a, b) when a <= b, do: b
 
   def process_regions(region_chars) do
     row.._ = get_row(Enum.take(region_chars, 7))

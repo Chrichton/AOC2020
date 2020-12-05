@@ -9,4 +9,8 @@ defmodule Day5Test do
 
     assert seat_id == 357
   end
+
+  test "solve1" do
+    assert Day5.solve1() == 994
+  end
 end
