@@ -9,6 +9,10 @@ defmodule Day5 do
     |> process_regions()
   end
 
+  # def process_seat_specifiers(seat_specifiers) do
+
+  # end
+
   def process_regions(region_chars) do
     row.._ = get_row(Enum.take(region_chars, 7))
     column.._ = get_column(Enum.drop(region_chars, 7))
