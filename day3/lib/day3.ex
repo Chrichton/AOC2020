@@ -9,11 +9,8 @@ defmodule Day3 do
     |> count_trees_on_way()
   end
 
-  def count_trees_on_way(map) do
-    max_y = Enum.count(map) - 1
-
-    count_trees_on_way_recursive(map, next_position(), {0, 0}, max_y, 0)
-  end
+  def count_trees_on_way(map),
+    do: count_trees_on_way_recursive(map, next_position(), {0, 0}, Enum.count(map) - 1, 0)
 
   def count_trees_on_way_recursive(_, _, {_, y}, max_y, acc) when y > max_y, do: acc
 
@@ -45,15 +42,24 @@ defmodule Day3 do
 
   # --------------
 
-  #   def solve2() do
-  #     File.read!("input")
-  #     |> String.split("\n")
-  #     |> count_trees_on_way_second_star()
-  #   end
+  def solve2() do
+    File.read!("input")
+    |> String.split("\n")
+    |> count_trees_on_way_second_star()
+  end
 
-  #   def count_trees_on_way_second_star(map) do
+  def count_trees_on_way_second_star(map) do
+    Enum.reduce(next_positions(), 1, fn next_position_func, acc ->
+      acc * count_trees_on_way_recursive(map, next_position_func, {0, 0}, Enum.count(map) - 1, 0)
+    end)
+  end
 
-  #   end
-
-  #   def next_positions({x, y}), do: [{x + 1, y + 1}, {x + 3, y + 1}, {x + 5, y + 1}, {x + 7, y + 1}, {x + 1, y + 2}]
+  def next_positions(),
+    do: [
+      fn {x, y} -> {x + 1, y + 1} end,
+      fn {x, y} -> {x + 3, y + 1} end,
+      fn {x, y} -> {x + 5, y + 1} end,
+      fn {x, y} -> {x + 7, y + 1} end,
+      fn {x, y} -> {x + 1, y + 2} end
+    ]
 end

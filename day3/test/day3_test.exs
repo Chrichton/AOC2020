@@ -19,4 +19,8 @@ defmodule Day3Test do
   test "solve1 input" do
     assert Day3.solve1() == 159
   end
+
+  test "solve2 input" do
+    assert Day3.solve2() == 159
+  end
 end
