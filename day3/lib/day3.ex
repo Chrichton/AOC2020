@@ -29,7 +29,6 @@ defmodule Day3 do
     max_x =
       Enum.at(map, 0)
       |> String.length()
-      |> Kernel.+(1)
 
     map
     |> Enum.at(y)
