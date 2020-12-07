@@ -83,13 +83,13 @@ defmodule Day7 do
   # -----------------------
 
   def solve2() do
-    File.read!("testinput")
+    File.read!("input")
     |> String.split("\n")
     |> calculate_contained_bags()
   end
 
   def calculate_contained_bags(bags) do
-    calculate_contained_bags_recursive(bags, to_name_quantity_list(bags, @shiny_gold_bag), [])
+    calculate_contained_bags_recursive(bags, to_name_quantity_list(bags, @shiny_gold_bag, 1), [])
   end
 
   def calculate_contained_bags_recursive(bags, names_quantities, acc) do
@@ -97,14 +97,17 @@ defmodule Day7 do
 
     current_names_quantities =
       names_quantities
-      |> Enum.flat_map(fn {name, _} -> to_name_quantity_list(bags, name) end)
+      |> Enum.flat_map(fn {name, _} ->
+        case Enum.find(acc, fn {acc_name, _} -> acc_name == name end) do
+          {_, acc_quantity} -> to_name_quantity_list(bags, name, acc_quantity)
+          _ -> to_name_quantity_list(bags, name, 1)
+        end
+      end)
       |> Enum.filter(fn {_, quantity} -> quantity > 0 end)
 
     if Enum.count(current_names_quantities) == 0 do
-      acc
+      Enum.reduce(acc, 0, fn {_, quantity}, acc -> acc + quantity end)
     else
-      current_names_quantities = update_current_names_quantities(current_names_quantities, acc)
-
       calculate_contained_bags_recursive(
         bags,
         current_names_quantities,
@@ -113,17 +116,8 @@ defmodule Day7 do
     end
   end
 
-  def update_current_names_quantities(current_names_quantities, acc) do
-    Enum.map(current_names_quantities, fn {name, quantity} ->
-      case Enum.find(acc, fn {acc_name, _} -> acc_name == name end) do
-        {_, acc_quantity} -> {name, quantity * acc_quantity}
-        _ -> {name, quantity}
-      end
-    end)
-  end
-
   #  :: [{name, quantity}]
-  def to_name_quantity_list(bags, bag_name) do
+  def to_name_quantity_list(bags, bag_name, bag_quantity) do
     [bag] = Enum.filter(bags, &String.starts_with?(&1, bag_name))
 
     String.split(bag, " ")
@@ -141,7 +135,7 @@ defmodule Day7 do
       quantity =
         if Enum.at(components, 0) == "no",
           do: 0,
-          else: String.to_integer(Enum.at(components, 0))
+          else: String.to_integer(Enum.at(components, 0)) * bag_quantity
 
       name =
         components
