@@ -32,7 +32,6 @@ defmodule Day7 do
     |> replace_occurrences(string_list)
     |> find_shiny_gold_bag_containers()
     |> replace_occurrences(string_list)
-
     |> find_shiny_gold_bag_occurrences()
     |> Enum.count()
   end
@@ -77,5 +76,47 @@ defmodule Day7 do
       |> Enum.join(" ")
 
     String.slice(first_three_words, 0, String.length(first_three_words) - 1)
+  end
+
+  # -----------------------
+
+  def solve2() do
+    File.read!("testinput")
+    |> String.split("\n")
+    |> calculate_contained_bags()
+  end
+
+  def calculate_contained_bags(string_list) do
+    [shiny_gold_bag_contents] =
+      Enum.filter(string_list, &String.starts_with?(&1, "shiny gold bags contain"))
+  end
+
+  def parse_bag(bags, bag_name) do
+    [bag] = Enum.filter(bags, &String.starts_with?(&1, bag_name))
+
+    String.split(bag, " ")
+    |> Enum.drop(4)
+    |> Enum.join(" ")
+    |> String.trim()
+    |> String.split(",")
+    |> Enum.map(fn bag_line ->
+      components =
+        bag_line
+        |> String.trim()
+        |> String.split(" ")
+
+      quantity =
+        components
+        |> Enum.at(0)
+        |> String.to_integer()
+
+      name =
+        components
+        |> Enum.drop(1)
+        |> Enum.join(" ")
+        |> String.replace(".", "")
+
+      {name, quantity}
+    end)
   end
 end
