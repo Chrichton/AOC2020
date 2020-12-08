@@ -45,7 +45,7 @@ defmodule Day1 do
   def find_triple_with_sum_2020(number1, [number2 | numbers]) do
     case Enum.reduce_while(numbers, {:error, "not_found"}, fn current, _accu -> sum_2020?([number1, number2, current]) end) do
       {:ok, found_numbers} -> {:ok, found_numbers}
-      _ -> find_triple_with_sum_2020(number1, numbers)
+      {:error, "not_found"} -> find_triple_with_sum_2020(number1, numbers)
     end
   end
 end
