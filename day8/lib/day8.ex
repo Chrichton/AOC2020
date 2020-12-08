@@ -14,7 +14,7 @@ defmodule Day8 do
     if Enum.member?(visited_positions, instruction_pointer) do
       {:infinte_loop, acc}
     else
-      if instruction_pointer > Enum.count(program) do
+      if instruction_pointer >= Enum.count(program) do
         {:ok, acc}
       else
         execute_command_without_check(program, instruction_pointer, visited_positions, acc)
@@ -68,12 +68,15 @@ defmodule Day8 do
   def solve2() do
     File.read!("testinput")
     |> String.split("\n")
-    |> patch_program(0)
+    |> patch_program_recursive(0)
   end
 
-  def patch_program(program, number_of_pathed_lines) do
+  def patch_program_recursive(program, number_of_pathed_lines) do
     already_patched_lines = Enum.take(program, number_of_pathed_lines)
     lines_to_patch = Enum.drop(program, number_of_pathed_lines)
+
+    IO.inspect(already_patched_lines)
+    IO.inspect(lines_to_patch)
 
     {result, value} = run_patched_program(already_patched_lines, lines_to_patch, "jmp", "nop")
 
@@ -85,10 +88,10 @@ defmodule Day8 do
           acc
 
         {:infinite_loop, patch_index} ->
-          patch_program(program, patch_index + 1)
+          patch_program_recursive(program, patch_index + 1)
 
         {:error, _} ->
-          patch_program(program, value + 1)
+          patch_program_recursive(program, value + 1)
       end
     end
   end
