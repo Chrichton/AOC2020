@@ -75,33 +75,43 @@ defmodule Day8 do
     already_patched_lines = Enum.take(program, number_of_pathed_lines)
     lines_to_patch = Enum.drop(program, number_of_pathed_lines)
 
-    {patched_lines, _} = patch_program(lines_to_patch, "jmp", "nop")
-    program = already_patched_lines ++ patched_lines
+    {result, value} = run_patched_program(already_patched_lines, lines_to_patch, "jmp", "nop")
 
-    case execute_command(program, 0, [], 0) do
-      {:ok, acc} ->
-        acc
+    if result == :ok do
+      value
+    else
+      case run_patched_program(already_patched_lines, lines_to_patch, "nop", "jmp") do
+        {:ok, acc} ->
+          acc
 
-      _ ->
-        {patched_lines, patch_index} = patch_program(lines_to_patch, "nop", "jmp")
-        program = already_patched_lines ++ patched_lines
-        case execute_command(program, 0, [], 0) do
-          {:ok, acc} -> acc
-          error -> error #patch_program(program, patch_index + 1)
-        end
+        {:infinite_loop, patch_index} ->
+          patch_program(program, patch_index + 1)
+
+        {:error, _} ->
+          patch_program(program, value + 1)
+      end
     end
   end
 
-  def patch_program(lines_to_patch, from_opcode, to_opcode) do
+  def run_patched_program(already_patched_lines, lines_to_patch, from_opcode, to_opcode) do
     patch_index = Enum.find_index(lines_to_patch, &String.starts_with?(&1, from_opcode))
 
-    patched_lines =
-      List.update_at(
-        lines_to_patch,
-        patch_index,
-        &(to_opcode <> String.slice(&1, 3, String.length(&1)))
-      )
+    if patch_index == nil do
+      {:error, from_opcode <> "not found"}
+    else
+      patched_lines =
+        List.update_at(
+          lines_to_patch,
+          patch_index,
+          &(to_opcode <> String.slice(&1, 3, String.length(&1)))
+        )
 
-    {patched_lines, patch_index}
+      program = already_patched_lines ++ patched_lines
+
+      case execute_command(program, 0, [], 0) do
+        {:infinte_loop, _} -> {:infinite_loop, patch_index}
+        {:ok, acc} -> {:ok, acc}
+      end
+    end
   end
 end
