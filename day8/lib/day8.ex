@@ -7,42 +7,51 @@ defmodule Day8 do
     File.read!("input")
     |> String.split("\n")
     |> execute_command(0, [], 0)
+    |> elem(1)
   end
 
   def execute_command(program, instruction_pointer, visited_positions, acc) do
     if Enum.member?(visited_positions, instruction_pointer) do
-      acc
+      {:infinte_loop, acc}
     else
-      {opcode, sign, value} =
-        program
-        |> Enum.at(instruction_pointer)
-        |> get_instruction()
-
-      case opcode do
-        "nop" ->
-          execute_command(
-            program,
-            instruction_pointer + 1,
-            [instruction_pointer | visited_positions],
-            acc
-          )
-
-        "acc" ->
-          execute_command(
-            program,
-            instruction_pointer + 1,
-            [instruction_pointer | visited_positions],
-            acc + get_signed_value(sign, value)
-          )
-
-        "jmp" ->
-          execute_command(
-            program,
-            instruction_pointer + get_signed_value(sign, value),
-            [instruction_pointer | visited_positions],
-            acc
-          )
+      if instruction_pointer > Enum.count(program) do
+        {:ok, acc}
+      else
+        execute_command_without_check(program, instruction_pointer, visited_positions, acc)
       end
+    end
+  end
+
+  def execute_command_without_check(program, instruction_pointer, visited_positions, acc) do
+    {opcode, sign, value} =
+      program
+      |> Enum.at(instruction_pointer)
+      |> get_instruction()
+
+    case opcode do
+      "nop" ->
+        execute_command(
+          program,
+          instruction_pointer + 1,
+          [instruction_pointer | visited_positions],
+          acc
+        )
+
+      "acc" ->
+        execute_command(
+          program,
+          instruction_pointer + 1,
+          [instruction_pointer | visited_positions],
+          acc + get_signed_value(sign, value)
+        )
+
+      "jmp" ->
+        execute_command(
+          program,
+          instruction_pointer + get_signed_value(sign, value),
+          [instruction_pointer | visited_positions],
+          acc
+        )
     end
   end
 
@@ -54,5 +63,28 @@ defmodule Day8 do
     value = String.slice(rest, 1, String.length(rest)) |> String.to_integer()
 
     {opcode, sign, value}
+  end
+
+  def solve2() do
+    File.read!("testinput")
+    |> String.split("\n")
+    |> patch_program(0)
+  end
+
+  def patch_program(program, number_of_pathed_lines) do
+    already_patched_lines = Enum.take(program, number_of_pathed_lines)
+    lines_to_patch = Enum.drop(program, number_of_pathed_lines)
+
+    patch_index = Enum.find_index(lines_to_patch, &String.starts_with?(&1, "jmp"))
+
+    patched_lines =
+      List.update_at(
+        lines_to_patch,
+        patch_index,
+        &("nop" <> String.slice(&1, 3, String.length(&1)))
+      )
+
+    program = already_patched_lines ++ patched_lines
+    execute_command(program, 0, [], 0)
   end
 end
