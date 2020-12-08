@@ -7,6 +7,6 @@ defmodule Day8Test do
   # end
 
   test "solve2" do
-    assert Day8.solve2() == 2051
+    assert Day8.solve2() == 8
   end
 end

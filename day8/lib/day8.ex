@@ -66,38 +66,30 @@ defmodule Day8 do
   end
 
   def solve2() do
-    File.read!("testinput")
+    File.read!("input")
     |> String.split("\n")
-    |> patch_program_recursive(0)
+    |> patch_program()
   end
 
-  def patch_program_recursive(program, number_of_pathed_lines) do
-    already_patched_lines = Enum.take(program, number_of_pathed_lines)
-    lines_to_patch = Enum.drop(program, number_of_pathed_lines)
+  def patch_program(program) do
+    case run_patched_program_recursive(program, 0, "nop", "jmp") do
+      {:ok, acc} ->
+        acc
 
-    # {result, value} = run_patched_program(already_patched_lines, lines_to_patch, "nop", "jmp")
-
-    # if result == :ok do
-    #   value
-    # else
-      case run_patched_program(already_patched_lines, lines_to_patch, "jmp", "nop") do
-        {:ok, acc} ->
-          acc
-
-        {:infinite_loop, patch_index} ->
-          patch_program_recursive(program, patch_index + 1)
-
-        error -> error
-
-      end
-    #end
+      _ ->
+        {:ok, acc} = run_patched_program_recursive(program, 0, "jmp", "nop")
+        acc
+    end
   end
 
-  def run_patched_program(already_patched_lines, lines_to_patch, from_opcode, to_opcode) do
+  def run_patched_program_recursive(program, number_of_patched_lines, from_opcode, to_opcode) do
+    already_patched_lines = Enum.take(program, number_of_patched_lines)
+    lines_to_patch = Enum.drop(program, number_of_patched_lines)
+
     patch_index = Enum.find_index(lines_to_patch, &String.starts_with?(&1, from_opcode))
 
     if patch_index == nil do
-      {:error, from_opcode <> "not found"}
+      {:error, from_opcode <> " not found"}
     else
       patched_lines =
         List.update_at(
@@ -106,11 +98,19 @@ defmodule Day8 do
           &(to_opcode <> String.slice(&1, 3, String.length(&1)))
         )
 
-      program = already_patched_lines ++ patched_lines
+      patched_program = already_patched_lines ++ patched_lines
 
-      case execute_command(program, 0, [], 0) do
-        {:infinte_loop, _} -> {:infinite_loop, patch_index + Enum.count(already_patched_lines)}
-        {:ok, acc} -> {:ok, acc}
+      case execute_command(patched_program, 0, [], 0) do
+        {:infinte_loop, _} ->
+          run_patched_program_recursive(
+            program,
+            patch_index + Enum.count(already_patched_lines) + 1,
+            from_opcode,
+            to_opcode
+          )
+
+        {:ok, acc} ->
+          {:ok, acc}
       end
     end
   end
