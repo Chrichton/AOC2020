@@ -75,25 +75,22 @@ defmodule Day8 do
     already_patched_lines = Enum.take(program, number_of_pathed_lines)
     lines_to_patch = Enum.drop(program, number_of_pathed_lines)
 
-    IO.inspect(already_patched_lines)
-    IO.inspect(lines_to_patch)
+    # {result, value} = run_patched_program(already_patched_lines, lines_to_patch, "nop", "jmp")
 
-    {result, value} = run_patched_program(already_patched_lines, lines_to_patch, "jmp", "nop")
-
-    if result == :ok do
-      value
-    else
-      case run_patched_program(already_patched_lines, lines_to_patch, "nop", "jmp") do
+    # if result == :ok do
+    #   value
+    # else
+      case run_patched_program(already_patched_lines, lines_to_patch, "jmp", "nop") do
         {:ok, acc} ->
           acc
 
         {:infinite_loop, patch_index} ->
           patch_program_recursive(program, patch_index + 1)
 
-        {:error, _} ->
-          patch_program_recursive(program, value + 1)
+        error -> error
+
       end
-    end
+    #end
   end
 
   def run_patched_program(already_patched_lines, lines_to_patch, from_opcode, to_opcode) do
@@ -112,7 +109,7 @@ defmodule Day8 do
       program = already_patched_lines ++ patched_lines
 
       case execute_command(program, 0, [], 0) do
-        {:infinte_loop, _} -> {:infinite_loop, patch_index}
+        {:infinte_loop, _} -> {:infinite_loop, patch_index + Enum.count(already_patched_lines)}
         {:ok, acc} -> {:ok, acc}
       end
     end
