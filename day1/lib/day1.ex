@@ -14,7 +14,7 @@ defmodule Day1 do
   def find_pair_with_sum_2020([number | numbers]) do
     case Enum.reduce_while(numbers, {:error, "not_found"}, fn current, _acc -> sum_2020?([number, current]) end) do
       {:ok, numbers} -> numbers
-      _ -> find_pair_with_sum_2020(numbers)
+      {:error, "not_found"} -> find_pair_with_sum_2020(numbers)
     end
   end
 
@@ -37,13 +37,13 @@ defmodule Day1 do
   def find_triple_with_sum_2020([number1 | numbers]) do
     case find_triple_with_sum_2020(number1, numbers) do
       {:ok, found_numbers} -> found_numbers
-      _ -> find_triple_with_sum_2020(numbers)
+      {:error, "not_found"} -> find_triple_with_sum_2020(numbers)
     end
   end
 
   def find_triple_with_sum_2020(_number1, []), do: {:error, "not_found"}
   def find_triple_with_sum_2020(number1, [number2 | numbers]) do
-    case Enum.reduce_while(numbers, {:error, "not_found"}, fn x, _accu -> sum_2020?([number1, number2, x]) end) do
+    case Enum.reduce_while(numbers, {:error, "not_found"}, fn current, _accu -> sum_2020?([number1, number2, current]) end) do
       {:ok, found_numbers} -> {:ok, found_numbers}
       _ -> find_triple_with_sum_2020(number1, numbers)
     end
