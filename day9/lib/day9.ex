@@ -33,6 +33,8 @@ defmodule Day9 do
 
   @result_solve1 105_950_735
 
+  #----------------------
+
   def solve2() do
     numbers = File.read!("input")
     |> String.split("\n")
