@@ -47,6 +47,7 @@ defmodule Day2 do
     |> Enum.filter(fn {from, to, char, password} ->
       codepoints = String.codepoints(password)
 
+      # xor
       (Enum.at(codepoints, from - 1) == char && Enum.at(codepoints, to - 1) != char) ||
         (Enum.at(codepoints, from - 1) != char && Enum.at(codepoints, to - 1) == char)
     end)
