@@ -52,9 +52,9 @@ defmodule Day12 do
 
   def move(direction, value, {x, y}) do
     case direction do
-      "N" -> {x, y - value}
+      "N" -> {x, y + value}
       "E" -> {x + value, y}
-      "S" -> {x, y + value}
+      "S" -> {x, y - value}
       "W" -> {x - value, y}
     end
   end
@@ -78,5 +78,78 @@ defmodule Day12 do
       |> String.to_integer()
 
     {String.at(command, 0), value}
+  end
+
+  # ------
+
+  def solve2() do
+    {{xs, ys}, {x, y}} =
+      File.read!("testinput")
+      |> String.split("\n")
+      |> execute_commands2({{0, 0}, {10, 1}})
+
+    abs(xs) + abs(ys)
+  end
+
+  def execute_commands2(commands, {{xs, ys}, {x, y}}) do
+    Enum.reduce(commands, {{xs, ys}, {x, y}}, fn command, acc ->
+      execute_command2(command, acc)
+    end)
+  end
+
+  def execute_command2(command, {{xs, ys}, {x, y}}) do
+    {command, value} = parse_command(command)
+
+    case command do
+      "N" ->
+        {x, y} = move("N", value, {x, y})
+        {{xs, ys}, {x, y}}
+
+      "S" ->
+        {x, y} = move("S", value, {x, y})
+        {{xs, ys}, {x, y}}
+
+      "E" ->
+        {x, y} = move("E", value, {x, y})
+        {{xs, ys}, {x, y}}
+
+      "W" ->
+        {x, y} = move("W", value, {x, y})
+        {{xs, ys}, {x, y}}
+
+      "L" ->
+        rotate_left({{xs, ys}, {x, y}}, value)
+
+      "R" ->
+        rotate_right({{xs, ys}, {x, y}}, value)
+
+      "F" ->
+        move_to_waypoint({{xs, ys}, {x, y}}, value)
+    end
+  end
+
+  def move_to_waypoint({{xs, ys}, {x, y}}, value), do: {{xs + x * value, ys + y * value}, {x, y}}
+
+  @spec rotate_right({{any, any}, {any, any}}, any) :: {{any, any}, {any, any}}
+  def rotate_right({{xs, ys}, {x, y}}, degrees) do
+    degrees = rem(degrees, 360)
+
+    case degrees do
+      0 -> {{xs, ys}, {x, y}}
+      90 -> {{xs, ys}, {y, -x}}
+      180 -> {{xs, ys}, {-y, -x}}
+      270 -> {{xs, ys}, {-x, y}}
+    end
+  end
+
+  def rotate_left({{xs, ys}, {x, y}}, degrees) do
+    degrees = rem(degrees, 360)
+
+    case degrees do
+      0 -> {{xs, ys}, {x, y}}
+      90 -> {{xs, ys}, {-x, y}}
+      180 -> {{xs, ys}, {-y, -x}}
+      270 -> {{xs, ys}, {y, x}}
+    end
   end
 end

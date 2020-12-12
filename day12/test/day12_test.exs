@@ -32,4 +32,8 @@ defmodule Day12Test do
     assert Day12.turn_left("E", 270) == "S"
     assert Day12.turn_left("E", 360) == "E"
   end
+
+  test "solve2" do
+    assert Day12.solve2() == 286
+  end
 end
