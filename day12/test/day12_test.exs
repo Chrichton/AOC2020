@@ -41,6 +41,6 @@ defmodule Day12Test do
   end
 
   test "solve2" do
-    assert Day12.solve2() == 286
+    assert Day12.solve2() == 42013
   end
 end

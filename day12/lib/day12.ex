@@ -137,8 +137,8 @@ defmodule Day12 do
     case degrees do
       0 -> {{xs, ys}, {x, y}}
       90 -> {{xs, ys}, {y, -x}}
-      180 -> {{xs, ys}, {-y, -x}}
-      270 -> {{xs, ys}, {x, -y}}
+      180 -> {{xs, ys}, {-x, -y}}
+      270 -> {{xs, ys}, {-y, x}}
     end
   end
 
@@ -147,8 +147,8 @@ defmodule Day12 do
 
     case degrees do
       0 -> {{xs, ys}, {x, y}}
-      90 -> {{xs, ys}, {x, -y}}
-      180 -> {{xs, ys}, {-y, -x}}
+      90 -> {{xs, ys}, {-y, x}}
+      180 -> {{xs, ys}, {-x, -y}}
       270 -> {{xs, ys}, {y, -x}}
     end
   end
