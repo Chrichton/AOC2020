@@ -10,8 +10,6 @@ defmodule Day12 do
       |> execute_commands({0, 0, "E"})
 
     abs(x) + abs(y)
-
-    {x, y}
   end
 
   def execute_commands(commands, {x, y, direction}) do
@@ -41,10 +39,10 @@ defmodule Day12 do
         {x, y, direction}
 
       "L" ->
-        {x, y, turn_left(direction)}
+        {x, y, turn_left(direction, value)}
 
       "R" ->
-        {x, y, turn_right(direction)}
+        {x, y, turn_right(direction, value)}
 
       "F" ->
         {x, y} = move(direction, value, {x, y})
@@ -61,22 +59,16 @@ defmodule Day12 do
     end
   end
 
-  def turn_left(direction) do
-    case direction do
-      "N" -> "W"
-      "E" -> "N"
-      "S" -> "E"
-      "W" -> "S"
-    end
-  end
+  def turn_left(direction, degrees), do: turn(direction, degrees, "WSEN")
 
-  def turn_right(direction) do
-    case direction do
-      "N" -> "E"
-      "E" -> "S"
-      "S" -> "W"
-      "W" -> "N"
-    end
+  def turn_right(direction, degrees), do: turn(direction, degrees, "NESW")
+
+  def turn(direction, degrees, directions) do
+    {index, _} = :binary.match(directions, direction)
+    degrees = rem(degrees, 360)
+    steps = div(degrees, 90)
+    index = rem(index + steps, 4)
+    String.at(directions, index)
   end
 
   def parse_command(command) do
