@@ -3,14 +3,12 @@ defmodule Day12Test do
   doctest Day12
 
   test "solve1 testdata" do
-    {x, y, _} =
+    {xs, ys, _} =
       File.read!("testinput")
       |> String.split("\n")
       |> Day12.execute_commands({0, 0, "E"})
 
-    result = abs(x) + abs(y)
-
-    assert result == 25
+    assert abs(xs) + abs(ys) == 25
   end
 
   test "solve1" do
@@ -31,6 +29,15 @@ defmodule Day12Test do
     assert Day12.turn_left("E", 180) == "W"
     assert Day12.turn_left("E", 270) == "S"
     assert Day12.turn_left("E", 360) == "E"
+  end
+
+  test "solve testdata" do
+    {{xs, ys}, _} =
+      File.read!("testinput")
+      |> String.split("\n")
+      |> Day12.execute_commands2({{0, 0}, {10, 1}})
+
+      assert abs(xs) + abs(ys) == 286
   end
 
   test "solve2" do

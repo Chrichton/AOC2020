@@ -83,8 +83,8 @@ defmodule Day12 do
   # ------
 
   def solve2() do
-    {{xs, ys}, {x, y}} =
-      File.read!("testinput")
+    {{xs, ys}, _} =
+      File.read!("input")
       |> String.split("\n")
       |> execute_commands2({{0, 0}, {10, 1}})
 
@@ -138,7 +138,7 @@ defmodule Day12 do
       0 -> {{xs, ys}, {x, y}}
       90 -> {{xs, ys}, {y, -x}}
       180 -> {{xs, ys}, {-y, -x}}
-      270 -> {{xs, ys}, {-x, y}}
+      270 -> {{xs, ys}, {x, -y}}
     end
   end
 
@@ -147,9 +147,9 @@ defmodule Day12 do
 
     case degrees do
       0 -> {{xs, ys}, {x, y}}
-      90 -> {{xs, ys}, {-x, y}}
+      90 -> {{xs, ys}, {x, -y}}
       180 -> {{xs, ys}, {-y, -x}}
-      270 -> {{xs, ys}, {y, x}}
+      270 -> {{xs, ys}, {y, -x}}
     end
   end
 end
