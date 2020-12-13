@@ -21,6 +21,8 @@ defmodule Day13Test do
     |> Day13.parse_input2()
     |> Enum.reverse()
     |> Day13.find_coincidence()
+
+    assert result == 3417
   end
 
   # test "solve2" do
