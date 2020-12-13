@@ -64,28 +64,35 @@ defmodule Day13 do
   end
 
   def find_coincidence(pairs) do
-    factor =
+    summand =
       pairs
       |> Enum.at(0)
       |> elem(0)
 
-    find_coincidence_recursive(pairs, factor)
+    find_coincidence_recursive(pairs, summand, 0)
   end
 
-  def find_coincidence_recursive(pairs, timestamp) do
+  def find_coincidence_recursive(pairs, summand, timestamp) do
     if check_coincidence(pairs, timestamp),
       do: timestamp,
-      else: find_coincidence_recursive(pairs, timestamp + timestamp)
+      else: find_coincidence_recursive(pairs, summand, timestamp + summand)
   end
 
   def check_coincidence(pairs, current_timestamp) do
-    pairs
-    |> Enum.map(fn {bus_id, timestamp} ->
-      {timestamp, get_nearest_departure_time(current_timestamp, bus_id)}
-    end)
-    |> Enum.filter(fn {timestamp, nearest_departure_time} ->
-      timestamp == nearest_departure_time
-    end)
-    |> Enum.count() == 1
+    map =
+      pairs
+      |> Enum.map(fn {bus_id, timestamp} ->
+        if current_timestamp >= bus_id,
+          do: {timestamp, rem(current_timestamp, bus_id)},
+          else: {timestamp, 0}
+      end)
+
+    filter =
+      map
+      |> Enum.filter(fn {timestamp, actual_timestamp} ->
+        timestamp == actual_timestamp
+      end)
+
+    Enum.count(filter) == Enum.count(map)
   end
 end
