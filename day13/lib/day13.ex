@@ -41,7 +41,7 @@ defmodule Day13 do
   # -------------
 
   def solve2() do
-    File.read!("testinput")
+    File.read!("input")
     |> String.split("\n")
     |> Enum.at(1)
     |> parse_input2()
@@ -57,7 +57,7 @@ defmodule Day13 do
         {result, timestamp + 1}
       else
         bus_id = String.to_integer(char)
-        {[{bus_id, timestamp} | result], timestamp + 1}
+        {[{bus_id, rem(bus_id - timestamp, bus_id)} | result], timestamp + 1}
       end
     end)
     |> elem(0)
@@ -70,29 +70,28 @@ defmodule Day13 do
       |> elem(0)
 
     find_coincidence_recursive(pairs, summand, 0)
+    |> elem(1)
   end
 
   def find_coincidence_recursive(pairs, summand, timestamp) do
     if check_coincidence(pairs, timestamp),
-      do: timestamp,
+      do: {pairs, timestamp},
       else: find_coincidence_recursive(pairs, summand, timestamp + summand)
   end
 
   def check_coincidence(pairs, current_timestamp) do
     map =
       pairs
-      |> Enum.map(fn {bus_id, timestamp} ->
+      |> Enum.map(fn {bus_id, required_timestamp} ->
         if current_timestamp >= bus_id,
-          do: {timestamp, rem(current_timestamp, bus_id)},
-          else: {timestamp, 0}
+          do: {required_timestamp, rem(current_timestamp, bus_id)},
+          else: {required_timestamp, 0}
       end)
 
-    filter =
       map
-      |> Enum.filter(fn {timestamp, actual_timestamp} ->
-        timestamp == actual_timestamp
+      |> Enum.filter(fn {required_timestamp, bus_timestamp} ->
+        required_timestamp == bus_timestamp
       end)
-
-    Enum.count(filter) == Enum.count(map)
+      |> Enum.count() == Enum.count(map)
   end
 end
