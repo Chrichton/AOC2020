@@ -4,19 +4,24 @@ defmodule Day14 do
   """
 
   def solve1() do
-    File.read!("testinput")
+    File.read!("input")
     |> parse_input()
     |> sum_memory_values()
   end
 
-  def sum_memory_values([{_mask, [{_mem_address, _value}]}] = values) do
-    Enum.map(values, &calc_memory_value/1)
+  # [{_mask, [{_mem_address, _value}]}]
+  def sum_memory_values(masks_values) do
+    Enum.map(masks_values, &calc_memory_value/1)
+    |> Enum.sum()
   end
 
-  def calc_memory_value({mask, [{_mem_address, _value}]} = value) do
-    Enum.map(elem(value, 1), fn {_mem_address, value} ->
-      calc_value(mask, value)
+  # {mask, [{_mem_address, _value}]}
+  def calc_memory_value({mask, values}) do
+    Enum.reduce(values, %{}, fn {mem_address, value}, acc ->
+      Map.put(acc, mem_address, calc_value(mask, value))
     end)
+    |> Map.values()
+    |> Enum.sum()
   end
 
   def calc_value(mask, mem_value) do

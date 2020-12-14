@@ -23,7 +23,16 @@ defmodule Day14Test do
     Day14.calc_value("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X", 11) == 73
   end
 
+  test "solve1 testdata" do
+    result =
+      File.read!("testinput")
+      |> Day14.parse_input()
+      |> Day14.sum_memory_values()
+
+      assert result == 165
+  end
+
   # test "solve1" do
-  #   assert Day14.solve1() == :world
+  #   assert Day14.solve1() == 165
   # end
 end
