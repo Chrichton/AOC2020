@@ -11,17 +11,18 @@ defmodule Day14 do
 
   # [{_mask, [{_mem_address, _value}]}]
   def sum_memory_values(masks_values) do
-    Enum.map(masks_values, &calc_memory_value/1)
+    Enum.reduce(masks_values, %{}, fn mask_values, acc ->
+      calc_memory_value(mask_values, acc)
+    end)
+    |> Map.values()
     |> Enum.sum()
   end
 
   # {mask, [{_mem_address, _value}]}
-  def calc_memory_value({mask, values}) do
-    Enum.reduce(values, %{}, fn {mem_address, value}, acc ->
+  def calc_memory_value({mask, values}, memory_map) do
+    Enum.reduce(values, memory_map, fn {mem_address, value}, acc ->
       Map.put(acc, mem_address, calc_value(mask, value))
     end)
-    |> Map.values()
-    |> Enum.sum()
   end
 
   def calc_value(mask, mem_value) do

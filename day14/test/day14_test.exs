@@ -34,6 +34,6 @@ defmodule Day14Test do
   end
 
   test "solve1" do
-    assert Day14.solve1() == 8703805870726
+    assert Day14.solve1() == 7477696999511
   end
 end
