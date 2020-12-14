@@ -48,7 +48,7 @@ defmodule Day14 do
     |> String.split("mask = ")
     |> Enum.drop(1)
     |> Enum.map(fn line ->
-      lines = String.split(line, "\n")
+      lines = String.split(line, "\n", trim: true)
       memories = parse_memories(Enum.drop(lines, 1))
 
       {Enum.at(lines, 0), memories}
