@@ -12,40 +12,59 @@ defmodule Day17 do
     |> Enum.count()
   end
 
-  def do_6_cycles(active_cubes, 7), do: active_cubes
+  def do_6_cycles(active_cubes, 6), do: active_cubes
 
-  def do_6_cycles(active_cubes, count), do: do_6_cycles(next_geneation(active_cubes), count + 1)
+  def do_6_cycles(active_cubes, count), do: do_6_cycles(next_generation(active_cubes), count + 1)
 
-  def next_geneation(active_cubes) do
-    remaning_actives =
-      Enum.filter(active_cubes, fn {x, y, z} ->
-        Enum.count(get_neighbors({x, y, z})) in 2..3
-      end)
+  def next_generation(active_cubes) do
+    MapSet.union(
+      remaning_active_cubes(active_cubes),
+      new_active_cubes(active_cubes)
+    )
+  end
 
-    new_actives = new_active_cubes(active_cubes)
-
-    remaning_actives ++ new_actives
+  def remaning_active_cubes(active_cubes) do
+    Enum.filter(active_cubes, fn {x, y, z} ->
+      Enum.count(active_neighbors({x, y, z}, active_cubes)) in 2..3
+    end)
+    |> MapSet.new()
   end
 
   def new_active_cubes(active_cubes) do
     active_cubes
-    # neighbors, that are not active
-    |> Enum.filter(fn {x, y, z} ->
-      not Enum.member?(get_neighbors({x, y, z}), {x, y, z})
-    end)
-    |> Enum.flat_map(fn {x, y, z} ->
-      # inactive neighbors
-      get_neighbors({x, y, z})
-      |> Enum.filter(fn {x, y, z} ->
-        neighbors_from_inactive_cube =
-          get_neighbors({x, y, z})
-          # neighbors, that are active
-          |> Enum.filter(fn {x, y, z} ->
-            Enum.member?(get_neighbors({x, y, z}), {x, y, z})
-          end)
+    |> Enum.reduce([], fn {x, y, z}, acc ->
+      new_actives =
+        active_neighbors({x, y, z}, active_cubes)
+        |> Enum.filter(fn {x, y, z} ->
+          active_neighbors({x, y, z}, active_cubes)
+          |> Enum.count() == 3
+        end)
 
-        Enum.count(neighbors_from_inactive_cube) == 3
-      end)
+      new_actives ++ acc
+    end)
+
+    # |> Enum.filter(fn {x, y, z} ->
+    #   inactive_neighbors({x, y, z}, active_cubes)
+    # end)
+    # |> Enum.flat_map(fn {x, y, z} ->
+    #   get_neighbors({x, y, z})
+    #   |> Enum.filter(fn {x, y, z} ->
+    #     active_neighbors({x, y, z}, active_cubes)
+    #     |> Enum.count() == 3
+    #   end)
+    # end)
+    |> MapSet.new()
+  end
+
+  def inactive_neighbors({x, y, z}, active_cubes) do
+    Enum.filter(get_neighbors({x, y, z}), fn {x, y, z} ->
+      not MapSet.member?(active_cubes, {x, y, z})
+    end)
+  end
+
+  def active_neighbors({x, y, z}, active_cubes) do
+    Enum.filter(get_neighbors({x, y, z}), fn {x, y, z} ->
+      MapSet.member?(active_cubes, {x, y, z})
     end)
   end
 
@@ -57,6 +76,7 @@ defmodule Day17 do
     |> Enum.map(fn {x, y, z, _} ->
       {x, y, z}
     end)
+    |> MapSet.new()
   end
 
   def parse_input(lines) do
@@ -74,13 +94,31 @@ defmodule Day17 do
   end
 
   def get_neighbors({x, y, z}) do
-    [
-      {x + 1, y, z},
-      {x, y + 1, z},
-      {x, y, z + 1},
-      {x - 1, y, z},
-      {x, y - 1, z},
-      {x, y, z - 1}
-    ]
+    neighbors_matrix()
+    |> Enum.map(fn {xm, ym, zm} -> {x + xm, y + ym, z + zm} end)
+    |> MapSet.new()
   end
+
+  def neighbors_matrix() do
+    shuffle([0, 1, -1])
+    |> Enum.map(fn [x, y, z] -> {x, y, z} end)
+    |> Enum.filter(fn {x, y, z} -> {x, y, z} != {0, 0, 0} end)
+  end
+
+  def shuffle(list), do: shuffle(list, length(list))
+
+  def shuffle([], _), do: [[]]
+  def shuffle(_,  0), do: [[]]
+  def shuffle(list, i) do
+    for x <- list, y <- shuffle(list, i-1), do: [x|y]
+  end
+
+
+
+  def active_cubes_count(active_cubes) do
+    Enum.map(active_cubes, fn {x, y, z} ->
+      Enum.count(get_neighbors({x, y, z}))
+    end)
+  end
+
 end

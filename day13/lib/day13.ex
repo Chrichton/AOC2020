@@ -69,7 +69,7 @@ defmodule Day13 do
       |> Enum.at(0)
       |> elem(0)
 
-    find_coincidence_recursive(pairs, summand, 0)
+    find_coincidence_recursive(pairs, summand, fact(100_000_000_000_000))
     |> elem(1)
   end
 
@@ -88,10 +88,14 @@ defmodule Day13 do
           else: {required_timestamp, 0}
       end)
 
-      map
-      |> Enum.filter(fn {required_timestamp, bus_timestamp} ->
-        required_timestamp == bus_timestamp
-      end)
-      |> Enum.count() == Enum.count(map)
+    map
+    |> Enum.filter(fn {required_timestamp, bus_timestamp} ->
+      required_timestamp == bus_timestamp
+    end)
+    |> Enum.count() == Enum.count(map)
+  end
+
+  def fact(n) do
+    ((n == 1 or n == 0) && 1) || n * fact(n - 1)
   end
 end

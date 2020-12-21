@@ -13,7 +13,7 @@ defmodule Day15 do
     next_number_recursive(initial_numbers, Enum.count(initial_numbers))
   end
 
-  def next_number_recursive([number_spoken | _], 2020), do: number_spoken
+  def next_number_recursive([number_spoken | _], 30_000_000), do: number_spoken
 
   def next_number_recursive(numbers_spoken, count) do
     last_number = Enum.at(numbers_spoken, 0)

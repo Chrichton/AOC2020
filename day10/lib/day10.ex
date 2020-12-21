@@ -37,8 +37,10 @@ defmodule Day10 do
     diff1_count * diff3_count
   end
 
+  # -------
+
   def solve2() do
-    File.read!("input")
+    File.read!("testinput")
     |> String.split("\n")
     |> Enum.map(&String.to_integer(&1))
     |> get_all_voltage_outputs()
@@ -53,12 +55,25 @@ defmodule Day10 do
     reversed
     |> Enum.drop(1)
     |> Enum.reverse()
-    |> get_all_combinations_recursive(voltage_outputs_count, last_voltage_output, 2, 0)
+    |> get_all_combinations_recursive(
+      voltage_outputs_count,
+      last_voltage_output,
+      get_min_m(voltage_outputs_count),
+      0
+    )
   end
 
-  def get_all_combinations_recursive(_, _, voltage_outputs_count, m, count) when m == voltage_outputs_count + 1, do: count
-  def get_all_combinations_recursive(voltage_outputs, voltage_outputs_count,
-                                     last_voltage_output, m, count) do
+  def get_all_combinations_recursive(_, _, voltage_outputs_count, m, count)
+      when m == voltage_outputs_count + 1,
+      do: count
+
+  def get_all_combinations_recursive(
+        voltage_outputs,
+        voltage_outputs_count,
+        last_voltage_output,
+        m,
+        count
+      ) do
     actual_count =
       comb(m, voltage_outputs)
       |> Enum.filter(fn voltage_outputs ->
@@ -91,6 +106,10 @@ defmodule Day10 do
   def comb(_, []), do: []
 
   def comb(m, [h | t]) do
-    for(l <- comb(m - 1, t), do: [h | l]) ++ comb(m, t)
+    for(l <- comb(m - 1, t),
+    is_integer(h) && l != [] && hd(l) - h <= 3,
+    do: [h | l]) ++ comb(m, t)
   end
+
+  def get_min_m(count), do: ceil(count / 3)
 end

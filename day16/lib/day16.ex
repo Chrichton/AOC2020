@@ -11,7 +11,7 @@ defmodule Day16 do
     |> Enum.sum()
   end
 
-  def invalid_field_numbers({_ny_tickets, nearby_ticket_numbers, valid_ranges}) do
+  def invalid_field_numbers({_ny_ticket_numbers, nearby_ticket_numbers, valid_ranges}) do
     Enum.filter(nearby_ticket_numbers, fn ticket_number ->
       not contains?(valid_ranges, ticket_number)
     end)
