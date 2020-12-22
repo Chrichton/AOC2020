@@ -4,7 +4,7 @@ defmodule Day17 do
   """
 
   def solve1() do
-    File.read!("testinput")
+    File.read!("input")
     |> String.split("\n")
     |> parse_input()
     |> active_cubes()
@@ -34,7 +34,7 @@ defmodule Day17 do
     active_cubes
     |> Enum.reduce([], fn {x, y, z}, acc ->
       new_actives =
-        active_neighbors({x, y, z}, active_cubes)
+        get_neighbors({x, y, z})
         |> Enum.filter(fn {x, y, z} ->
           active_neighbors({x, y, z}, active_cubes)
           |> Enum.count() == 3
@@ -42,31 +42,14 @@ defmodule Day17 do
 
       new_actives ++ acc
     end)
-
-    # |> Enum.filter(fn {x, y, z} ->
-    #   inactive_neighbors({x, y, z}, active_cubes)
-    # end)
-    # |> Enum.flat_map(fn {x, y, z} ->
-    #   get_neighbors({x, y, z})
-    #   |> Enum.filter(fn {x, y, z} ->
-    #     active_neighbors({x, y, z}, active_cubes)
-    #     |> Enum.count() == 3
-    #   end)
-    # end)
     |> MapSet.new()
   end
 
-  def inactive_neighbors({x, y, z}, active_cubes) do
-    Enum.filter(get_neighbors({x, y, z}), fn {x, y, z} ->
-      not MapSet.member?(active_cubes, {x, y, z})
-    end)
-  end
+  def inactive_neighbors({x, y, z}, active_cubes),
+    do: MapSet.difference(get_neighbors({x, y, z}), active_cubes)
 
-  def active_neighbors({x, y, z}, active_cubes) do
-    Enum.filter(get_neighbors({x, y, z}), fn {x, y, z} ->
-      MapSet.member?(active_cubes, {x, y, z})
-    end)
-  end
+  def active_neighbors({x, y, z}, active_cubes),
+    do: MapSet.intersection(get_neighbors({x, y, z}), active_cubes)
 
   def active_cubes(cubes) do
     cubes
@@ -108,17 +91,15 @@ defmodule Day17 do
   def shuffle(list), do: shuffle(list, length(list))
 
   def shuffle([], _), do: [[]]
-  def shuffle(_,  0), do: [[]]
+  def shuffle(_, 0), do: [[]]
+
   def shuffle(list, i) do
-    for x <- list, y <- shuffle(list, i-1), do: [x|y]
+    for x <- list, y <- shuffle(list, i - 1), do: [x | y]
   end
-
-
 
   def active_cubes_count(active_cubes) do
     Enum.map(active_cubes, fn {x, y, z} ->
       Enum.count(get_neighbors({x, y, z}))
     end)
   end
-
 end
