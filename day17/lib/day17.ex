@@ -24,19 +24,19 @@ defmodule Day17 do
   end
 
   def remaning_active_cubes(active_cubes) do
-    Enum.filter(active_cubes, fn [x, y, z] ->
-      Enum.count(active_neighbors([x, y, z], active_cubes)) in 2..3
+    Enum.filter(active_cubes, fn cube ->
+      Enum.count(active_neighbors(cube, active_cubes)) in 2..3
     end)
     |> MapSet.new()
   end
 
   def new_active_cubes(active_cubes) do
     active_cubes
-    |> Enum.reduce([], fn [x, y, z], acc ->
+    |> Enum.reduce([], fn cube, acc ->
       new_actives =
-        get_neighbors([x, y, z])
-        |> Enum.filter(fn [x, y, z] ->
-          active_neighbors([x, y, z], active_cubes)
+        get_neighbors(cube)
+        |> Enum.filter(fn cube ->
+          active_neighbors(cube, active_cubes)
           |> Enum.count() == 3
         end)
 
@@ -45,11 +45,11 @@ defmodule Day17 do
     |> MapSet.new()
   end
 
-  def inactive_neighbors([x, y, z], active_cubes),
-    do: MapSet.difference(get_neighbors([x, y, z]), active_cubes)
+  def inactive_neighbors(cube, active_cubes),
+    do: MapSet.difference(get_neighbors(cube), active_cubes)
 
-  def active_neighbors([x, y, z], active_cubes),
-    do: MapSet.intersection(get_neighbors([x, y, z]), active_cubes)
+  def active_neighbors(cube, active_cubes),
+    do: MapSet.intersection(get_neighbors(cube), active_cubes)
 
   def active_cubes(cubes, dimensions_count \\ 3) do
     cubes
@@ -77,18 +77,20 @@ defmodule Day17 do
     end)
   end
 
-  def get_neighbors([x, y, z]) do
+  def get_neighbors(cube) do
     neighbors_matrix()
-    |> Enum.map(fn [xm, ym, zm] ->
-      Enum.zip([xm, ym, zm], [x, y, z])
-      |> Enum.map(fn {m, n} -> m + n end)
+    |> Enum.map(fn matrix_cube ->
+      Enum.zip(matrix_cube, cube)
+      |> Enum.map(fn {cube_component, matrix_cube_component} ->
+        cube_component + matrix_cube_component
+      end)
     end)
     |> MapSet.new()
   end
 
   def neighbors_matrix(dimensions_count \\ 3) do
     shuffle([0, 1, -1], dimensions_count)
-    |> Enum.filter(fn [x, y, z] -> [x, y, z] != [0, 0, 0] end)
+    |> Enum.filter(fn cube -> cube != [0, 0, 0] end)
   end
 
   def shuffle(list), do: shuffle(list, length(list))
@@ -101,8 +103,8 @@ defmodule Day17 do
   end
 
   def active_cubes_count(active_cubes) do
-    Enum.map(active_cubes, fn [x, y, z] ->
-      Enum.count(get_neighbors([x, y, z]))
+    Enum.map(active_cubes, fn cube ->
+      Enum.count(get_neighbors(cube))
     end)
   end
 end
