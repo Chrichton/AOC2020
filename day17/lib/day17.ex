@@ -57,7 +57,7 @@ defmodule Day17 do
       char == "#"
     end)
     |> Enum.map(fn {x, y, _} ->
-      tuple = {x, y, 0}
+      {x, y, 0}
     end)
     |> MapSet.new()
   end
@@ -78,14 +78,13 @@ defmodule Day17 do
 
   def get_neighbors({x, y, z}) do
     neighbors_matrix()
-    |> Enum.map(fn {xm, ym, zm} -> {x + xm, y + ym, z + zm} end)
+    |> Enum.map(fn [xm, ym, zm] -> {x + xm, y + ym, z + zm} end)
     |> MapSet.new()
   end
 
-  def neighbors_matrix() do
-    shuffle([0, 1, -1])
-    |> Enum.map(fn [x, y, z] -> {x, y, z} end)
-    |> Enum.filter(fn {x, y, z} -> {x, y, z} != {0, 0, 0} end)
+  def neighbors_matrix(dimensions_count \\ 3) do
+    shuffle([0, 1, -1], dimensions_count)
+    |> Enum.filter(fn [x, y, z] -> [x, y, z] != [0, 0, 0] end)
   end
 
   def shuffle(list), do: shuffle(list, length(list))
