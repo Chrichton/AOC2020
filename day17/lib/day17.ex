@@ -53,11 +53,11 @@ defmodule Day17 do
 
   def active_cubes(cubes) do
     cubes
-    |> Enum.filter(fn {_x, _y, _z, char} ->
+    |> Enum.filter(fn {_x, _y, char} ->
       char == "#"
     end)
-    |> Enum.map(fn {x, y, z, _} ->
-      {x, y, z}
+    |> Enum.map(fn {x, y, _} ->
+      tuple = {x, y, 0}
     end)
     |> MapSet.new()
   end
@@ -71,7 +71,7 @@ defmodule Day17 do
       columns
       |> Enum.zip(0..(Enum.count(columns) - 1))
       |> Enum.map(fn {char, x} ->
-        {x, y, 0, char}
+        {x, y, char}
       end)
     end)
   end

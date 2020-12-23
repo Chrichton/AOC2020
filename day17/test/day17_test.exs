@@ -103,6 +103,6 @@ defmodule Day17Test do
   end
 
   test "solve1" do
-    assert Day17.solve1() == 42
+    assert Day17.solve1() == 388
   end
 end
