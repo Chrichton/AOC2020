@@ -24,19 +24,19 @@ defmodule Day17 do
   end
 
   def remaning_active_cubes(active_cubes) do
-    Enum.filter(active_cubes, fn {x, y, z} ->
-      Enum.count(active_neighbors({x, y, z}, active_cubes)) in 2..3
+    Enum.filter(active_cubes, fn [x, y, z] ->
+      Enum.count(active_neighbors([x, y, z], active_cubes)) in 2..3
     end)
     |> MapSet.new()
   end
 
   def new_active_cubes(active_cubes) do
     active_cubes
-    |> Enum.reduce([], fn {x, y, z}, acc ->
+    |> Enum.reduce([], fn [x, y, z], acc ->
       new_actives =
-        get_neighbors({x, y, z})
-        |> Enum.filter(fn {x, y, z} ->
-          active_neighbors({x, y, z}, active_cubes)
+        get_neighbors([x, y, z])
+        |> Enum.filter(fn [x, y, z] ->
+          active_neighbors([x, y, z], active_cubes)
           |> Enum.count() == 3
         end)
 
@@ -45,11 +45,11 @@ defmodule Day17 do
     |> MapSet.new()
   end
 
-  def inactive_neighbors({x, y, z}, active_cubes),
-    do: MapSet.difference(get_neighbors({x, y, z}), active_cubes)
+  def inactive_neighbors([x, y, z], active_cubes),
+    do: MapSet.difference(get_neighbors([x, y, z]), active_cubes)
 
-  def active_neighbors({x, y, z}, active_cubes),
-    do: MapSet.intersection(get_neighbors({x, y, z}), active_cubes)
+  def active_neighbors([x, y, z], active_cubes),
+    do: MapSet.intersection(get_neighbors([x, y, z]), active_cubes)
 
   def active_cubes(cubes) do
     cubes
@@ -57,7 +57,7 @@ defmodule Day17 do
       char == "#"
     end)
     |> Enum.map(fn {x, y, _} ->
-      {x, y, 0}
+      [x, y, 0]
     end)
     |> MapSet.new()
   end
@@ -76,9 +76,9 @@ defmodule Day17 do
     end)
   end
 
-  def get_neighbors({x, y, z}) do
+  def get_neighbors([x, y, z]) do
     neighbors_matrix()
-    |> Enum.map(fn [xm, ym, zm] -> {x + xm, y + ym, z + zm} end)
+    |> Enum.map(fn [xm, ym, zm] -> [x + xm, y + ym, z + zm] end)
     |> MapSet.new()
   end
 
@@ -97,8 +97,8 @@ defmodule Day17 do
   end
 
   def active_cubes_count(active_cubes) do
-    Enum.map(active_cubes, fn {x, y, z} ->
-      Enum.count(get_neighbors({x, y, z}))
+    Enum.map(active_cubes, fn [x, y, z] ->
+      Enum.count(get_neighbors([x, y, z]))
     end)
   end
 end
