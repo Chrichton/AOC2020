@@ -51,13 +51,14 @@ defmodule Day17 do
   def active_neighbors([x, y, z], active_cubes),
     do: MapSet.intersection(get_neighbors([x, y, z]), active_cubes)
 
-  def active_cubes(cubes) do
+  def active_cubes(cubes, dimensions_count \\ 3) do
     cubes
     |> Enum.filter(fn {_x, _y, char} ->
       char == "#"
     end)
     |> Enum.map(fn {x, y, _} ->
-      [x, y, 0]
+      tail = List.duplicate(0, dimensions_count - 2)
+      [x | [y | tail]]
     end)
     |> MapSet.new()
   end
@@ -78,7 +79,10 @@ defmodule Day17 do
 
   def get_neighbors([x, y, z]) do
     neighbors_matrix()
-    |> Enum.map(fn [xm, ym, zm] -> [x + xm, y + ym, z + zm] end)
+    |> Enum.map(fn [xm, ym, zm] ->
+      Enum.zip([xm, ym, zm], [x, y, z])
+      |> Enum.map(fn {m, n} -> m + n end)
+    end)
     |> MapSet.new()
   end
 
