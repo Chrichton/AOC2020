@@ -4,27 +4,71 @@ defmodule Day22 do
   """
   defmodule Game do
     defstruct p1_cards: [],
-              p2_cards: []
+              p1_previous_decks: [],
+              p2_cards: [],
+              p2_previous_decks: []
   end
 
-  def solve1() do
+  def solve2() do
     File.read!("input")
     |> parse()
-    |> play_game()
+    |> play_game(false)
   end
 
-  def play_game(%Game{p1_cards: []} = game), do: calculate_score(game.p2_cards)
-  def play_game(%Game{p2_cards: []} = game), do: calculate_score(game.p1_cards)
-  def play_game(%Game{} = game) do
-    [p1_card | p1_tail] = game.p1_cards
-    [p2_card | p2_tail] = game.p2_cards
+  def winner_player1?(p1_card, p2_card), do: p1_card > p2_card
+  def winner_player1?(player), do: player == :player1
 
-    next_game = if p1_card > p2_card,
-      do: %Game{p1_cards: p1_tail ++ [p1_card] ++ [p2_card], p2_cards: p2_tail},
-      else: %Game{p1_cards: p1_tail, p2_cards: p2_tail ++ [p2_card] ++ [p1_card]}
+  def play_game(%Game{p1_cards: []}, true), do: :player2
+  def play_game(%Game{p2_cards: []}, true), do: :player1
+  def play_game(%Game{p1_cards: []} = game, false), do: calculate_score(game.p2_cards)
+  def play_game(%Game{p2_cards: []} = game, false), do: calculate_score(game.p1_cards)
 
-      play_game(next_game)
+  def play_game(%Game{} = game, is_recursive_combat) do
+    if Enum.member?(game.p1_previous_decks, game.p1_cards) ||
+         Enum.member?(game.p2_previous_decks, game.p2_cards) do
+      if is_recursive_combat,
+        do: :player1,
+        else: calculate_score(game.p1_cards)
+    else
+      [p1_card | p1_tail] = game.p1_cards
+      [p2_card | p2_tail] = game.p2_cards
+
+      is_winner_player1 =
+        if Enum.count(p1_tail) >= p1_card && Enum.count(p2_tail) >= p2_card do
+          play_sub_game(%Game{
+            p1_cards: p1_tail,
+            p1_previous_decks: [],
+            p2_cards: p2_tail,
+            p2_previous_decks: []
+          })
+          |> winner_player1?()
+        else
+          winner_player1?(p1_card, p2_card)
+        end
+
+      game
+      |> get_next_game(p1_card, p1_tail, p2_card, p2_tail, is_winner_player1)
+      |> play_game(is_recursive_combat)
+    end
   end
+
+  def get_next_game(%Game{} = game, p1_card, p1_tail, p2_card, p2_tail, is_winner_player1) do
+    if is_winner_player1,
+      do: %Game{
+        p1_cards: p1_tail ++ [p1_card] ++ [p2_card],
+        p2_cards: p2_tail,
+        p1_previous_decks: [game.p1_cards | game.p1_previous_decks],
+        p2_previous_decks: [game.p2_cards | game.p2_previous_decks]
+      },
+      else: %Game{
+        p1_cards: p1_tail,
+        p2_cards: p2_tail ++ [p2_card] ++ [p1_card],
+        p1_previous_decks: [game.p1_cards | game.p1_previous_decks],
+        p2_previous_decks: [game.p2_cards | game.p2_previous_decks]
+      }
+  end
+
+  def play_sub_game(%Game{} = game), do: play_game(game, true)
 
   def calculate_score(cards) do
     cards
@@ -39,7 +83,12 @@ defmodule Day22 do
       |> String.split("\n\n")
       |> Enum.map(&parse_player_cards/1)
 
-    %Game{p1_cards: player_1_cards, p2_cards: player_2_cards}
+    %Game{
+      p1_cards: player_1_cards,
+      p2_cards: player_2_cards,
+      p1_previous_decks: [],
+      p2_previous_decks: []
+    }
   end
 
   def parse_player_cards(player_string) do
