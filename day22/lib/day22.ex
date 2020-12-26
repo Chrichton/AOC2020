@@ -4,9 +4,8 @@ defmodule Day22 do
   """
   defmodule Game do
     defstruct p1_cards: [],
-              p1_previous_decks: [],
               p2_cards: [],
-              p2_previous_decks: []
+              previous_decks: MapSet
   end
 
   def solve2() do
@@ -24,8 +23,7 @@ defmodule Day22 do
   def play_game(%Game{p2_cards: []} = game, false), do: calculate_score(game.p1_cards)
 
   def play_game(%Game{} = game, is_recursive_combat) do
-    if Enum.member?(game.p1_previous_decks, game.p1_cards) ||
-         Enum.member?(game.p2_previous_decks, game.p2_cards) do
+    if MapSet.member?(game.previous_decks, {game.p1_cards, game.p2_cards}) do
       if is_recursive_combat,
         do: :player1,
         else: calculate_score(game.p1_cards)
@@ -36,10 +34,9 @@ defmodule Day22 do
       is_winner_player1 =
         if Enum.count(p1_tail) >= p1_card && Enum.count(p2_tail) >= p2_card do
           play_sub_game(%Game{
-            p1_cards: p1_tail,
-            p1_previous_decks: [],
-            p2_cards: p2_tail,
-            p2_previous_decks: []
+            p1_cards: Enum.slice(p1_tail, 0, p1_card),
+            p2_cards: Enum.slice(p2_tail, 0, p2_card),
+            previous_decks: %MapSet{}
           })
           |> winner_player1?()
         else
@@ -55,16 +52,14 @@ defmodule Day22 do
   def get_next_game(%Game{} = game, p1_card, p1_tail, p2_card, p2_tail, is_winner_player1) do
     if is_winner_player1,
       do: %Game{
-        p1_cards: p1_tail ++ [p1_card] ++ [p2_card],
+        p1_cards: p1_tail ++ [p1_card, p2_card],
         p2_cards: p2_tail,
-        p1_previous_decks: [game.p1_cards | game.p1_previous_decks],
-        p2_previous_decks: [game.p2_cards | game.p2_previous_decks]
+        previous_decks: MapSet.put(game.previous_decks, {game.p1_cards, game.p2_cards})
       },
       else: %Game{
         p1_cards: p1_tail,
-        p2_cards: p2_tail ++ [p2_card] ++ [p1_card],
-        p1_previous_decks: [game.p1_cards | game.p1_previous_decks],
-        p2_previous_decks: [game.p2_cards | game.p2_previous_decks]
+        p2_cards: p2_tail ++ [p2_card, p1_card],
+        previous_decks: MapSet.put(game.previous_decks, {game.p1_cards, game.p2_cards})
       }
   end
 
@@ -86,8 +81,7 @@ defmodule Day22 do
     %Game{
       p1_cards: player_1_cards,
       p2_cards: player_2_cards,
-      p1_previous_decks: [],
-      p2_previous_decks: []
+      previous_decks: %MapSet{}
     }
   end
 
